@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sticky Notes Dashboard</title>
+  <link rel="stylesheet" href="./styles/dashboard.css">
+</head>
+<body>
+  <div class="app-container">
+    <div class="top-bar">
+      <h1>Dashboard</h1>
+      <!-- Add a Refresh button next to the Create New Note button -->
+      <div class="top-actions">
+        <button class="btn create-note-btn" onclick="createNote()">➕ Create New Note</button>
+        <button class="btn refresh-btn" onclick="loadNotes()">🔄</button>
+      </div>
+
+    </div>
+
+    <ul id="note-list">
+    </ul>
+  </div>
+
+  <script src="dashboard.js"></script>
+</body>
+</html>

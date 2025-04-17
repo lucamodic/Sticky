@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>View Note</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="note-container">
+    <div class="top-bar">
+      <h2 id="note-name"></h2>
+      <button onclick="togglePin()" style="background: none; border:none;">📌</button>
+    </div>
+
+    <div class="note-content">
+        <pre id="note-text"></pre> <!-- Note content displayed here -->
+    </div>
+
+    <div class="todo-section">
+      <h3>To-Do List:</h3>
+      <ul id="todo-list"></ul>
+    </div>
+  </div>
+
+  <script src="view.js"></script>
+</body>
+</html>

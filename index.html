@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Note Editor</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="note-container">
+    <div class="top-bar">
+      <div class="note-actions">
+        <button onclick="togglePin()">🔒</button>
+        <button onclick="deleteNote()">🗑️</button>
+      </div>
+    </div>
+
+    <div class="note-content">
+      <label for="note-name">Note Name:</label>
+      <input type="text" id="note-name" placeholder="Untitled Note">
+      <label for="note">Content:</label>
+      <textarea id="note" placeholder="Type your note here..."></textarea>
+    </div>
+
+    <div class="todo-section">
+      <label for="todo-input">To-Do List:</label>
+      <div class="todo-input">
+        <input type="text" id="todo-input" placeholder="Add a to-do...">
+        <button onclick="addTodo()">➕ Add To-Do</button>
+      </div>
+      <ul id="todo-list"></ul>
+    </div>
+  </div>
+
+  <script src="renderer.js"></script>
+  <script>
+    // Auto resize the textarea
+    const textarea = document.getElementById('note');
+    textarea.addEventListener('input', () => {
+      textarea.style.height = 'auto';
+      textarea.style.height = textarea.scrollHeight + 'px';
+    });
+  </script>
+</body>
+</html>
+
