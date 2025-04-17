@@ -20,7 +20,7 @@ function loadNotes() {
 
     const titleSpan = document.createElement('span');
     titleSpan.classList.add('note-title');
-    titleSpan.textContent = noteData.name || 'Untitled';
+    titleSpan.textContent = noteData.reference || 'Untitled';
 
 
     const actionsDiv = document.createElement('note-actions');

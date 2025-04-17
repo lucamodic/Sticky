@@ -17,6 +17,7 @@ if (noteId) {
   }
   document.getElementById('note-name').value = data.name;
   document.getElementById('note').value = data.note;
+  document.getElementById('reference').value = data.reference;
   renderTodos();
 }
 
@@ -29,6 +30,7 @@ ipcRenderer.on('load-note', (event, id, mode = 'edit') => {
 
   document.getElementById('note-name').value = data.name;
   document.getElementById('note').value = data.note;
+  document.getElementById('reference').value = data.reference;
   renderTodos();
 
   if (mode === 'view') {
@@ -50,6 +52,7 @@ ipcRenderer.on('note-deleted', () => {
 function saveData() {
   if (dataPath) {
     data.name = document.getElementById('note-name').value; // Save name
+    data.reference = document.getElementById('reference').value; // Save name
     data.note = document.getElementById('note').value; // Save note content
     fs.writeFileSync(dataPath, JSON.stringify(data, null, 2));
   }
@@ -57,6 +60,7 @@ function saveData() {
 
 document.getElementById('note-name').addEventListener('input', saveData); // Save on name change
 document.getElementById('note').addEventListener('input', saveData);
+document.getElementById('reference').addEventListener('input', saveData);
 
 function renderTodos() {
   const todoList = document.getElementById('todo-list');
@@ -83,11 +87,14 @@ function addTodo() {
   const input = document.getElementById('todo-input');
   const text = input.value.trim();
   if (text) {
+    // Add the new to-do to the data.todos array
     data.todos.push({ text, done: false });
-    input.value = '';
-    renderTodos();
+    input.value = ''; // Clear the input field
+    saveData(); // Save the new to-do
+    renderTodos(); // Re-render the to-do list
   }
 }
+
 
 async function togglePin() {
   const result = await ipcRenderer.invoke('toggle-always-on-top');

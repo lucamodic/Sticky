@@ -40,9 +40,9 @@ function renderTodos() {
       data.todos[i].done = !data.todos[i].done;
       fs.writeFileSync(dataPath, JSON.stringify(data, null, 2));
     };
-    li.appendChild(checkbox);
     li.append(" " + todo.text);
     todoList.appendChild(li);
+    li.appendChild(checkbox);
   });
 }
 

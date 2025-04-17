@@ -132,6 +132,7 @@ textarea:focus {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  font-size:12px;
 }
 
 #todo-list li {
@@ -164,7 +165,7 @@ textarea:focus {
 
 /* Note text */
 .note-content pre {
-  font-size: 10px;
+  font-size: 8px;
   white-space: pre-wrap;
   word-wrap: break-word;
   line-height: 1.5;

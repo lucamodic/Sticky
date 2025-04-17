@@ -1,5 +1,6 @@
 {
   "name": "",
   "note": "Name      -  AC    -    HP    -     PP\nCaballot  -  14    -    11    -     11\nChoxs     -  14    -    15    -     12\nVanzaphir -  13    -    10    -     11\nDragger   -  14    -    17    -     12",
-  "todos": []
+  "todos": [],
+  "reference": "AC HP PP"
 }
