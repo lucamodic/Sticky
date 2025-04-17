@@ -47,11 +47,7 @@ function renderTodos() {
 }
 
 function togglePin() {
-  const pinButton = document.querySelector('#pin-button');
-  pinButton.classList.toggle('pinned');
-  
   ipcRenderer.invoke('toggle-always-on-top');
-  console.log("Pinned:", pinButton.classList.contains('pinned'));
 }
 
 function closeWindow() {
@@ -60,9 +56,10 @@ function closeWindow() {
 
 // Add event listener for keypress events (ESC and `)
 document.addEventListener('keydown', (event) => {
+  console.log('Key pressed:', event.key, event.code); // 👈 Check both!
   if (event.key === 'Escape') {
     closeWindow();
-  } else if (event.key === '`') { // backtick key
+  } else if (event.key === '`') {
     togglePin();
   }
 });

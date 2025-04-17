@@ -27,6 +27,7 @@ function createNoteWindow(id = Date.now(), mode = 'edit') {
     width: 400,
     height: 600,
     alwaysOnTop: false,
+    hasShadow: false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: true,
@@ -48,6 +49,7 @@ function createViewWindow(id) {
     height: 600,
     alwaysOnTop: false,
     frame: false,
+    hasShadow: false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: true,
