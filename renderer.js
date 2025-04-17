@@ -92,6 +92,8 @@ function addTodo() {
 async function togglePin() {
   const result = await ipcRenderer.invoke('toggle-always-on-top');
   console.log("Pinned:", result);
+  const pinButton = document.getElementById('pin-button');
+  pinButton.classList.toggle('pinned');
 }
 
 function deleteNote() {

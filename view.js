@@ -11,14 +11,20 @@ ipcRenderer.on('load-note', (event, id) => {
     data = JSON.parse(fs.readFileSync(dataPath));
   }
 
-  document.getElementById('note-name').textContent = data.name || '';
+  const noteNameEl = document.getElementById('note-name');
+  if (data.name && data.name.trim() !== '') {
+    noteNameEl.textContent = data.name;
+  } else {
+    noteNameEl.style.display = 'none';
+  }
+
   document.getElementById('note-text').textContent = data.note || '';
-  
+
   // Conditionally render the To-Do section
   if (data.todos && data.todos.length > 0) {
     renderTodos();
   } else {
-    document.querySelector('.todo-section').style.display = 'none'; // Hide todo section if no todos
+    document.querySelector('.todo-section').style.display = 'none';
   }
 });
 
@@ -41,9 +47,22 @@ function renderTodos() {
 }
 
 function togglePin() {
-  const pinButton = document.querySelector('.top-bar button');  // Obtener el botón
-  pinButton.classList.toggle('pinned');  
+  const pinButton = document.querySelector('#pin-button');
+  pinButton.classList.toggle('pinned');
   
-  const result = ipcRenderer.invoke('toggle-always-on-top');
-  console.log("Pinned:", result);
+  ipcRenderer.invoke('toggle-always-on-top');
+  console.log("Pinned:", pinButton.classList.contains('pinned'));
 }
+
+function closeWindow() {
+  ipcRenderer.invoke('close-view-window');
+}
+
+// Add event listener for keypress events (ESC and `)
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape') {
+    closeWindow();
+  } else if (event.key === '`') { // backtick key
+    togglePin();
+  }
+});
