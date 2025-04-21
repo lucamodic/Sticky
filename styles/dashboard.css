@@ -15,17 +15,14 @@
       overflow: hidden;
     }
 
-    .app-container {
-      text-align: center;
-      width: 90%;
-      max-width: 900px;
-      background: rgba(255, 255, 255, 0.9);
-      padding: 30px;
-      border-radius: 16px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-      backdrop-filter: blur(12px);
-    }
-
+.app-container {
+  width: 100%;
+  max-width: 900px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
     .header {
       display: flex;
       justify-content: space-between;
@@ -93,12 +90,12 @@
         margin-top:5px;
     }
     .note-actions {
-  margin-top: 10px;
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
 
 .note-title {
   display: block;
@@ -146,4 +143,19 @@
 
 .note-actions button:hover {
   background-color: #007bb5; /* Darker Blue on hover */
+}
+
+.notes-scroll-wrapper {
+  flex: 1; /* Fill remaining vertical space */
+  overflow-y: auto;
+  padding-right: 8px; /* for scrollbar space */
+}
+
+#note-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }

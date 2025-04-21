@@ -10,17 +10,18 @@
   <div class="app-container">
     <div class="top-bar">
       <h1>Dashboard</h1>
-      <!-- Add a Refresh button next to the Create New Note button -->
       <div class="top-actions">
         <button class="btn create-note-btn" onclick="createNote()">➕ Create New Note</button>
         <button class="btn refresh-btn" onclick="loadNotes()">🔄</button>
       </div>
-
     </div>
 
-    <ul id="note-list">
-    </ul>
+    <!-- Add this wrapper -->
+    <div class="notes-scroll-wrapper">
+      <ul id="note-list"></ul>
+    </div>
   </div>
+
 
   <script src="dashboard.js"></script>
 </body>
