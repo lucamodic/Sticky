@@ -3,8 +3,9 @@ require('@electron/remote/main').initialize();
 const path = require('path');
 const fs = require('fs');
 
-const dataDir = path.join(__dirname, 'data');
-if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir);
+const userDataPath = app.getPath('userData');
+const dataDir = path.join(userDataPath, 'data');
+if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
 
 function createDashboard() {
   const win = new BrowserWindow({
