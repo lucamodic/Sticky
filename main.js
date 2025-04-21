@@ -4,7 +4,6 @@ const path = require('path');
 const fs = require('fs');
 
 const dataDir = path.join(__dirname, 'data');
-console.log(dataDir);
 if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir);
 
 function createDashboard() {
@@ -12,14 +11,14 @@ function createDashboard() {
     width: 600,
     height: 700,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'), // Preload JS for communication
+      preload: path.join(__dirname, 'dashboard', 'preload.js'),
       nodeIntegration: true,
       contextIsolation: false,
     }
   });
 
   require('@electron/remote/main').enable(win.webContents);
-  win.loadFile('dashboard.html');
+  win.loadFile(path.join('dashboard', 'dashboard.html'));
 }
 
 function createNoteWindow(id = Date.now(), mode = 'edit') {
@@ -29,18 +28,17 @@ function createNoteWindow(id = Date.now(), mode = 'edit') {
     alwaysOnTop: false,
     hasShadow: false,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      preload: path.join(__dirname, 'create-note', 'preload.js'),
       nodeIntegration: true,
       contextIsolation: false
     }
   });
 
-  win.loadFile('index.html');
+  require('@electron/remote/main').enable(win.webContents);
+  win.loadFile(path.join('create-note', 'index.html'));
   win.webContents.once('did-finish-load', () => {
     win.webContents.send('load-note', id, mode);
   });
-
-  require('@electron/remote/main').enable(win.webContents);
 }
 
 function createViewWindow(id) {
@@ -51,37 +49,29 @@ function createViewWindow(id) {
     frame: false,
     hasShadow: false,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      preload: path.join(__dirname, 'view-note', 'preload.js'),
       nodeIntegration: true,
       contextIsolation: false
     }
   });
 
-  win.loadFile('view.html');
+  require('@electron/remote/main').enable(win.webContents);
+  win.loadFile(path.join('view-note', 'view.html'));
   win.webContents.once('did-finish-load', () => {
     win.webContents.send('load-note', id);
   });
-
-  require('@electron/remote/main').enable(win.webContents);
 }
 
-
-// IPC to create a new note
+// IPC listeners
 ipcMain.on('new-note', (event) => {
   const id = Date.now();
-  const noteData = { name: '', note: '', todos: [] };
+  const noteData = { name: '', note: '', todos: [], reference: '' };
 
-  // Save the new note to the filesystem
   fs.writeFileSync(path.join(dataDir, `note-${id}.json`), JSON.stringify(noteData));
-
-  // Notify the renderer (dashboard) that a new note has been created
   event.reply('note-created', id);
-
-  // Create the note window
   createNoteWindow(id);
 });
 
-// IPC to open an existing note
 ipcMain.on('open-note', (event, id, mode = 'edit') => {
   createNoteWindow(id, mode);
 });
@@ -90,19 +80,12 @@ ipcMain.on('view-note', (event, id) => {
   createViewWindow(id);
 });
 
-
 ipcMain.on('delete-note', (event, id) => {
   const notePath = path.join(dataDir, `note-${id}.json`);
-  if (fs.existsSync(notePath)) {
-    fs.unlinkSync(notePath);  // Delete the note from the filesystem
-  }
-
-  // Notify all renderers (dashboard) that the note has been deleted
+  if (fs.existsSync(notePath)) fs.unlinkSync(notePath);
   event.sender.send('note-deleted');
 });
 
-
-// Handle pin/unpin
 ipcMain.handle('toggle-always-on-top', () => {
   const win = BrowserWindow.getFocusedWindow();
   const current = win?.isAlwaysOnTop() ?? false;
@@ -110,15 +93,12 @@ ipcMain.handle('toggle-always-on-top', () => {
   return !current;
 });
 
-app.whenReady().then(() => {
-  createDashboard();
-});
-
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit();
-});
-
 ipcMain.handle('close-view-window', (event) => {
   const win = BrowserWindow.fromWebContents(event.sender);
   if (win) win.close();
+});
+
+app.whenReady().then(createDashboard);
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') app.quit();
 });
