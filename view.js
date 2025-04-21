@@ -19,12 +19,16 @@ ipcRenderer.on('load-note', (event, id) => {
   }
 
   document.getElementById('note-text').textContent = data.note || '';
+  const noteText = data.note || '';
+  document.getElementById('note-text').innerHTML = noteText
+    .replace(/\t/g, '<span class="tab"></span>')
+    .replace(/\n/g, '<br>');
 
   // Conditionally render the To-Do section
   if (data.todos && data.todos.length > 0) {
     renderTodos();
   } else {
-    document.querySelector('.todo-section').style.display = 'none';
+    document.querySelector('.todo-content').style.display = 'none';
   }
 });
 
@@ -40,9 +44,13 @@ function renderTodos() {
       data.todos[i].done = !data.todos[i].done;
       fs.writeFileSync(dataPath, JSON.stringify(data, null, 2));
     };
-    li.append(" " + todo.text);
-    todoList.appendChild(li);
+    
+    const textSpan = document.createElement('span');
+    textSpan.textContent = todo.text;
+    
+    li.appendChild(textSpan);
     li.appendChild(checkbox);
+    todoList.appendChild(li);
   });
 }
 

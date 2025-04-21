@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>View Note</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="./styles/view.css">
 </head>
 <body>
   <div class="note-container">
@@ -12,12 +12,14 @@
       <h2 id="note-name"></h2>
     </div>
 
-    <div class="note-content">
-      <pre id="note-text"></pre>
-    </div>
+    <div class="note-content-wrapper">
+      <div class="note-content">
+        <pre id="note-text"></pre>
+      </div>
 
-    <div class="note-content">
-      <ul id="todo-list"></ul>
+      <div class="todo-content">
+        <ul id="todo-list"></ul>
+      </div>
     </div>
   </div>
   <script src="view.js"></script>
