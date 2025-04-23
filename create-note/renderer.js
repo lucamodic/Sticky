@@ -1,12 +1,11 @@
 const { ipcRenderer } = require('electron');
 const fs = require('fs');
-const path = require('path');
 
-let dataPath;
+let dataPath = '';
 let data = { name: '', note: '', todos: [], reference: '' };
 
-ipcRenderer.on('load-note', (event, id, mode = 'edit') => {
-  dataPath = path.join(__dirname, '..', 'data', `note-${id}.json`);
+ipcRenderer.on('load-note', (event, id, pathFromMain, mode = 'edit') => {
+  dataPath = pathFromMain;
   if (fs.existsSync(dataPath)) {
     data = JSON.parse(fs.readFileSync(dataPath));
   }
@@ -23,11 +22,20 @@ ipcRenderer.on('load-note', (event, id, mode = 'edit') => {
 });
 
 function saveData() {
-  if (!dataPath) return;
-  data.name = document.getElementById('note-name').value;
-  data.note = document.getElementById('note').value;
-  data.reference = document.getElementById('reference').value;
-  fs.writeFileSync(dataPath, JSON.stringify(data, null, 2));
+  if (!dataPath) {
+    console.error('No data path set!');
+    return;
+  }
+  
+  try {
+    data.name = document.getElementById('note-name').value;
+    data.note = document.getElementById('note').value;
+    data.reference = document.getElementById('reference').value;
+    fs.writeFileSync(dataPath, JSON.stringify(data, null, 2));
+    console.log('Note saved successfully to:', dataPath);
+  } catch (error) {
+    console.error('Error saving note:', error);
+  }
 }
 
 document.getElementById('note-name').addEventListener('input', saveData);
@@ -63,18 +71,4 @@ function addTodo() {
     saveData();
     renderTodos();
   }
-}
-
-async function togglePin() {
-  const result = await ipcRenderer.invoke('toggle-always-on-top');
-  document.getElementById('pin-button')?.classList.toggle('pinned', result);
-}
-
-function deleteNote() {
-  if (!dataPath) return;
-  const id = path.basename(dataPath).match(/\d+/)[0];
-  fs.unlinkSync(dataPath);
-  ipcRenderer.send('delete-note', id);
-
-  require('@electron/remote').getCurrentWindow().close();
 }

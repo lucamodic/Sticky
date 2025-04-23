@@ -1,49 +1,85 @@
 const { ipcRenderer } = require('electron');
+const remote = require('@electron/remote'); // ✅ correct way!
+
 const fs = require('fs');
 const path = require('path');
 
-const notesDir = path.join(__dirname, '..', 'data');
+// Get the correct app data path
+const notesDir = path.join(remote.app.getPath('userData'), 'data');
 const noteList = document.getElementById('note-list');
 
 function loadNotes() {
-  if (!fs.existsSync(notesDir)) return;
-  const files = fs.readdirSync(notesDir).filter(f => f.startsWith('note-'));
-  noteList.innerHTML = '';
+  console.log('Loading notes from:', notesDir);  // Debug log
+  
+  if (!fs.existsSync(notesDir)) {
+    console.log('Notes directory does not exist');
+    return;
+  }
 
-  files.forEach(file => {
-    const id = file.match(/\d+/)[0];
-    const noteData = JSON.parse(fs.readFileSync(path.join(notesDir, file)));
+  try {
+    const files = fs.readdirSync(notesDir).filter(f => f.startsWith('note-'));
+    console.log('Found note files:', files);  // Debug log
+    
+    noteList.innerHTML = '';
 
-    const li = document.createElement('li');
+    files.forEach(file => {
+      try {
+        const filePath = path.join(notesDir, file);
+        const fileContent = fs.readFileSync(filePath, 'utf-8');
+        const noteData = JSON.parse(fileContent);
+        const id = file.match(/\d+/)[0];
 
-    const title = document.createElement('span');
-    title.classList.add('note-title');
-    title.textContent = noteData.reference || 'Untitled';
+        const li = document.createElement('li');
+        li.className = 'note-item';
 
-    const actions = document.createElement('div');
-    actions.classList.add('note-actions');
+        const title = document.createElement('span');
+        title.className = 'note-title';
+        title.textContent = noteData.name || noteData.reference || 'Untitled Note';
+        if (noteData.name) {
+          title.setAttribute('title', noteData.name);  // Show full name on hover
+        }
 
-    const viewBtn = document.createElement('button');
-    viewBtn.textContent = '🔍 View';
-    viewBtn.onclick = () => ipcRenderer.send('view-note', id);
+        const actions = document.createElement('div');
+        actions.className = 'note-actions';
 
-    const editBtn = document.createElement('button');
-    editBtn.textContent = '✏️ Edit';
-    editBtn.onclick = () => ipcRenderer.send('open-note', id, 'edit');
+        const viewBtn = document.createElement('button');
+        viewBtn.className = 'btn-view';
+        viewBtn.innerHTML = '<i class="icon-eye"></i> View';
+        viewBtn.onclick = () => ipcRenderer.send('view-note', id);
 
-    actions.appendChild(viewBtn);
-    actions.appendChild(editBtn);
-    li.appendChild(title);
-    li.appendChild(actions);
-    noteList.appendChild(li);
-  });
+        const editBtn = document.createElement('button');
+        editBtn.className = 'btn-edit';
+        editBtn.innerHTML = '<i class="icon-edit"></i> Edit';
+        editBtn.onclick = () => ipcRenderer.send('open-note', id, 'edit');
+
+        actions.appendChild(viewBtn);
+        actions.appendChild(editBtn);
+        li.appendChild(title);
+        li.appendChild(actions);
+        noteList.appendChild(li);
+
+      } catch (err) {
+        console.error(`Error loading note ${file}:`, err);
+      }
+    });
+
+  } catch (err) {
+    console.error('Error reading notes directory:', err);
+  }
 }
 
 function createNote() {
   ipcRenderer.send('new-note');
 }
 
+// Refresh notes every 2 seconds (optional)
+setInterval(loadNotes, 2000);
+
+// Initial load and event listeners
+document.addEventListener('DOMContentLoaded', () => {
+  loadNotes();
+  document.getElementById('new-note-btn').addEventListener('click', createNote);
+});
+
 ipcRenderer.on('note-created', loadNotes);
 ipcRenderer.on('note-deleted', loadNotes);
-
-loadNotes();

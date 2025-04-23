@@ -5,7 +5,23 @@ const fs = require('fs');
 
 const userDataPath = app.getPath('userData');
 const dataDir = path.join(userDataPath, 'data');
-if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
+
+// Debug paths
+console.log('User data path:', userDataPath);
+console.log('Data directory:', dataDir);
+
+function ensureDataDir() {
+  try {
+    if (!fs.existsSync(dataDir)) {
+      fs.mkdirSync(dataDir, { recursive: true });
+    }
+  } catch (error) {
+    console.error('Could not create data directory:', error);
+  }
+}
+
+ensureDataDir();
+
 
 function createDashboard() {
   const win = new BrowserWindow({
@@ -23,6 +39,7 @@ function createDashboard() {
 }
 
 function createNoteWindow(id = Date.now(), mode = 'edit') {
+  const notePath = path.join(dataDir, `note-${id}.json`);
   const win = new BrowserWindow({
     width: 400,
     height: 600,
@@ -38,11 +55,12 @@ function createNoteWindow(id = Date.now(), mode = 'edit') {
   require('@electron/remote/main').enable(win.webContents);
   win.loadFile(path.join('create-note', 'index.html'));
   win.webContents.once('did-finish-load', () => {
-    win.webContents.send('load-note', id, mode);
+    win.webContents.send('load-note', id, notePath, mode);
   });
 }
 
 function createViewWindow(id) {
+  const notePath = path.join(dataDir, `note-${id}.json`);
   const win = new BrowserWindow({
     width: 400,
     height: 600,
@@ -59,16 +77,16 @@ function createViewWindow(id) {
   require('@electron/remote/main').enable(win.webContents);
   win.loadFile(path.join('view-note', 'view.html'));
   win.webContents.once('did-finish-load', () => {
-    win.webContents.send('load-note', id);
+    win.webContents.send('load-note', id, notePath, 'view');
   });
 }
 
-// IPC listeners
 ipcMain.on('new-note', (event) => {
   const id = Date.now();
   const noteData = { name: '', note: '', todos: [], reference: '' };
+  const notePath = path.join(dataDir, `note-${id}.json`);
 
-  fs.writeFileSync(path.join(dataDir, `note-${id}.json`), JSON.stringify(noteData));
+  fs.writeFileSync(notePath, JSON.stringify(noteData));
   event.reply('note-created', id);
   createNoteWindow(id);
 });
