@@ -1,12 +1,12 @@
 const { ipcRenderer } = require('electron');
 const fs = require('fs');
-const path = require('path');
 
 let dataPath;
 let data = { name: '', note: '', todos: [] };
 
-ipcRenderer.on('load-note', (event, id) => {
-  dataPath = path.join(__dirname, '..', 'data', `note-${id}.json`);
+// ✅ Updated to receive full path from main process
+ipcRenderer.on('load-note', (event, id, pathFromMain) => {
+  dataPath = pathFromMain;
   if (fs.existsSync(dataPath)) {
     data = JSON.parse(fs.readFileSync(dataPath));
   }
@@ -20,18 +20,14 @@ ipcRenderer.on('load-note', (event, id) => {
     .replace(/\t/g, '<span class="tab"></span>')
     .replace(/\n/g, '<br>');
 
-    renderTodos();
+  renderTodos();
 });
-
 
 function renderTodos() {
   const list = document.getElementById('todo-list');
   list.innerHTML = '';
   data.todos.forEach((todo, i) => {
     const li = document.createElement('li');
-
-    const text = document.createElement('span');
-    text.textContent = todo.text;
 
     const checkbox = document.createElement('input');
     checkbox.type = 'checkbox';
@@ -41,8 +37,11 @@ function renderTodos() {
       fs.writeFileSync(dataPath, JSON.stringify(data, null, 2));
     };
 
-    li.appendChild(text);
+    const text = document.createElement('span');
+    text.textContent = todo.text;
+
     li.appendChild(checkbox);
+    li.appendChild(text);
     list.appendChild(li);
   });
 }
