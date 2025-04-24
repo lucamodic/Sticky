@@ -72,3 +72,19 @@ function addTodo() {
     renderTodos();
   }
 }
+
+function deleteNote() {
+  if (!dataPath) return;
+
+  const id = dataPath.match(/note-(\d+)\.json$/)?.[1];
+  if (!id) {
+    console.error('Could not extract note ID');
+    return;
+  }
+
+  const confirmed = confirm("Are you sure you want to delete this note?");
+  if (!confirmed) return;
+
+  ipcRenderer.send('delete-note', id);
+  window.close();
+}
