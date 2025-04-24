@@ -22,7 +22,6 @@ function ensureDataDir() {
 
 ensureDataDir();
 
-
 function createDashboard() {
   const win = new BrowserWindow({
     width: 600,
@@ -118,6 +117,13 @@ ipcMain.handle('close-view-window', (event) => {
 });
 
 app.whenReady().then(createDashboard);
+
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
+});
+
+app.on('activate', () => {
+  if (BrowserWindow.getAllWindows().length === 0) {
+    createDashboard();
+  }
 });
